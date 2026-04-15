@@ -7,7 +7,7 @@
     "ministats": "./dist/ministats"
   },
   "scripts": {
-    "build": "bun build src/index.ts --outfile dist/ministats --target=bun --compile && chmod +x dist/ministats",
+    "build": "bun build src/index.ts --outfile dist/ministats --target=bun-linux-x64-baseline --compile --minify --production --bytecode && xz -9k dist/ministats && chmod +x dist/ministats*",
     "dev": "bun run src/index.ts",
     "start": "bun run dist/ministats.js"
   },

@@ -18,12 +18,11 @@ console.log(`Version bumped to ${newVersion}`);
 const distPath = join(__dirname, "..", "dist");
 const xzPath = join(distPath, "ministats.xz");
 
+execSync("rm -f dist/ministats dist/ministats.xz");
 execSync("bun build src/index.ts --outfile dist/ministats --target=bun-linux-x64-baseline --compile --minify --production --bytecode", { stdio: "inherit" });
 console.log("Binary built");
 
-if (!existsSync(xzPath)) {
-  execSync(`xz -9 -f ${join(distPath, "ministats")}`, { stdio: "inherit" });
-}
+execSync(`xz -9 ${join(distPath, "ministats")}`, { stdio: "inherit" });
 execSync("chmod +x dist/ministats*", { stdio: "inherit" });
 console.log("Binary compressed");
 

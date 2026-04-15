@@ -1,6 +1,6 @@
 {
   "name": "ministats",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "Real-time system metrics dashboard",
   "author": "Javier Leandro Arancibia",
   "module": "src/index.ts",

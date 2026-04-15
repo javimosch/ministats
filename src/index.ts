@@ -1,5 +1,11 @@
 import { startServer } from "./server.ts";
 import { startClient } from "./client.ts";
+import { writeFileSync, chmodSync, unlinkSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const args = process.argv.slice(2);
 
@@ -9,6 +15,7 @@ if (args.length === 0) {
   console.log("Usage:");
   console.log("  ministats server --port <port>    Start the server (default: 9094)");
   console.log("  ministats client --name <name> --server <url>    Start a client");
+  console.log("  ministats update                   Update to latest version");
   process.exit(1);
 }
 
@@ -43,6 +50,41 @@ if (command === "server") {
   }
 
   startClient(name, server);
+} else if (command === "update") {
+  const execPath = process.argv[1];
+  const execDir = dirname(execPath);
+  console.log("Checking for updates...");
+
+  (async () => {
+    try {
+      const releaseUrl = "https://api.github.com/repos/javimosch/ministats/releases/latest";
+      const releaseRes = await fetch(releaseUrl, {
+        headers: { "Accept": "application/vnd.github+json" }
+      });
+      if (!releaseRes.ok) throw new Error(`GitHub API error: ${releaseRes.status}`);
+      const release = await releaseRes.json();
+
+      const asset = release.assets?.find((a: any) => a.name === "ministats.xz");
+      if (!asset) throw new Error("No binary asset found in release");
+
+      const downloadUrl = asset.browser_download_url;
+      console.log(`Downloading ${downloadUrl}...`);
+      const binRes = await fetch(downloadUrl);
+      if (!binRes.ok) throw new Error(`Download failed: ${binRes.status}`);
+      const binData = await binRes.arrayBuffer();
+
+      const tmpPath = join(execDir, "ministats.new");
+      writeFileSync(tmpPath, Buffer.from(binData));
+      chmodSync(tmpPath, 0o755);
+
+      unlinkSync(execPath);
+      chmodSync(tmpPath, 0o755);
+      console.log(`Updated to ${release.tag_name}. Restart ministats to use the new version.`);
+    } catch (err) {
+      console.error(`Update failed: ${err}`);
+      process.exit(1);
+    }
+  })();
 } else {
   console.error(`Unknown command: ${command}`);
   process.exit(1);

@@ -4,20 +4,27 @@ import { writeFileSync, chmodSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
+import { version } from "../package.json" assert { type: "json" };
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const args = process.argv.slice(2);
 
-if (args.length === 0) {
+if (args.length === 0 || args[0] === "-v" || args[0] === "--version") {
+  console.log(`ministats ${version}`);
+  process.exit(0);
+}
+
+if (args[0] === "help" || args[0] === "--help") {
   console.log("MiniStats - Real-time system metrics dashboard");
   console.log("");
   console.log("Usage:");
   console.log("  ministats server --port <port>    Start the server (default: 9094)");
   console.log("  ministats client --name <name> --server <url>    Start a client");
   console.log("  ministats update                   Update to latest version");
-  process.exit(1);
+  console.log("  ministats -v, --version           Show version");
+  process.exit(0);
 }
 
 const command = args[0];

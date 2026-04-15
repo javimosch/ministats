@@ -2,33 +2,31 @@
 
 Real-time system metrics dashboard.
 
-## Commands
+## Install
 
-### Server
-```sh
-bun run src/index.ts server --port 9094
-```
+```bash
+# Server
+curl -fsSL https://raw.githubusercontent.com/javimosch/ministats/master/dist/ministats -o /usr/local/bin/ministats && chmod +x /usr/local/bin/ministats
 
-### Client
-```sh
-bun run src/index.ts client --name <machine-name> --server http://<server-host>:9094
-```
-
-## Build
-```sh
-bun run build
+# Client
+curl -fsSL https://raw.githubusercontent.com/javimosch/ministats/master/dist/ministats -o /usr/local/bin/ministats && chmod +x /usr/local/bin/ministats
 ```
 
 ## Usage
 
-1. Start the server:
-```sh
-bun run start server --port 9094
+### Start Server
+```bash
+ministrats server --port 9094
+```
+Then open `http://localhost:9094` in your browser.
+
+### Start Client (on machines to monitor)
+```bash
+ministrats client --name my-machine --server http://YOUR_SERVER_IP:9094
 ```
 
-2. Open dashboard at `http://localhost:9094`
-
-3. Start clients on machines you want to monitor:
-```sh
-bun run start client --name prod-web-01 --server http://your-server:9094
+## Build from Source
+```bash
+bun install
+bun run build
 ```

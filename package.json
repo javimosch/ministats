@@ -4,10 +4,10 @@
   "description": "Real-time system metrics dashboard",
   "module": "src/index.ts",
   "bin": {
-    "ministats": "./dist/index.js"
+    "ministats": "./dist/ministats"
   },
   "scripts": {
-    "build": "bun build src/index.ts --outdir dist --target=bun --minify && chmod +x dist/index.js",
+    "build": "bun build src/index.ts --outfile dist/ministats --target=bun --compile && chmod +x dist/ministats",
     "dev": "bun run src/index.ts",
     "start": "bun run dist/ministats.js"
   },

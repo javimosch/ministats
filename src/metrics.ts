@@ -12,14 +12,14 @@ export async function getMemoryMetrics(): Promise<MemoryMetrics> {
 }
 
 export async function getDiskMetrics(): Promise<DiskMetrics> {
-  const proc = Bun.spawn(["df", "-BG", "/"], { stdout: "pipe" });
+  const proc = Bun.spawn(["df", "-h", "/"], { stdout: "pipe" });
   const output = await new Response(proc.stdout).text();
   const lines = output.trim().split("\n");
   const diskLine = lines[1];
   if (!diskLine) throw new Error("Could not parse df output");
   const parts = diskLine.split(/\s+/);
-  const totalGB = parseInt(parts[1]);
-  const usedGB = parseInt(parts[2]);
+  const total = parts[1];
+  const used = parts[2];
   const usePercent = parseInt(parts[4].replace("%", ""));
 
   const iProc = Bun.spawn(["df", "-i", "/"], { stdout: "pipe" });
@@ -29,7 +29,7 @@ export async function getDiskMetrics(): Promise<DiskMetrics> {
   if (!iLine) throw new Error("Could not parse df -i output for inodes");
   const iUsePercent = parseInt(iLine.split(/\s+/)[4].replace("%", ""));
 
-  return { used: `${usedGB}G`, total: `${totalGB}G`, usePercent, iUsePercent };
+  return { used, total, usePercent, iUsePercent };
 }
 
 export async function getCpuMetrics(): Promise<CpuMetrics> {

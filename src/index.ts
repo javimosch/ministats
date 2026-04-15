@@ -59,7 +59,6 @@ if (command === "server") {
 
   startClient(name, server);
 } else if (command === "update") {
-  const execPath = process.argv[1];
   console.log("Checking for updates...");
 
   (async () => {
@@ -84,8 +83,11 @@ if (command === "server") {
       writeFileSync(tmpPath, Buffer.from(binData));
       chmodSync(tmpPath, 0o755);
 
-      execSync(`cp ${tmpPath} ${execPath}`);
-      console.log(`Updated to ${release.tag_name}. Restart ministats to use the new version.`);
+      const homeDir = process.env.HOME || "/root";
+      const installPath = join(homeDir, ".local", "bin", "ministats");
+      execSync(`cp ${tmpPath} ${installPath}`);
+      chmodSync(installPath, 0o755);
+      console.log(`Updated to ${release.tag_name}. Installed to ${installPath}`);
     } catch (err) {
       console.error(`Update failed: ${err}`);
       process.exit(1);

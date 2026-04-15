@@ -1,5 +1,6 @@
 import { handleClientMessage, getAllClients } from "./state.ts";
 import type { ServerBroadcast } from "./types.ts";
+import { version } from "../package.json" assert { type: "json" };
 
 const METRICS_HTML = `<!DOCTYPE html>
 <html lang="en">
@@ -86,12 +87,14 @@ const METRICS_HTML = `<!DOCTYPE html>
     .value.warning { color: #F5A623; }
     .value.danger { color: #E61919; }
     .empty-state { padding: 40px; text-align: center; color: #666; }
+    .version { text-align: center; margin-top: 24px; font-size: 11px; color: #555; }
   </style>
 </head>
 <body>
-  <div>
+    <div>
     <div class="brand">MINI<span>STATS</span></div>
     <div class="container" id="machines"></div>
+    <div class="version">v${version}</div>
   </div>
   <script>
     const ws = new WebSocket(\`ws://\${location.host}/ws\`);

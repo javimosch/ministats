@@ -1,6 +1,6 @@
 {
   "name": "ministats",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Real-time system metrics dashboard",
   "author": "Javier Leandro Arancibia",
   "module": "src/index.ts",
@@ -11,7 +11,7 @@
     "build": "bun build src/index.ts --outfile dist/ministats --target=bun-linux-x64-baseline --compile --minify --production --bytecode && xz -9k dist/ministats && chmod +x dist/ministats*",
     "dev": "bun run src/index.ts",
     "start": "bun run dist/ministats.js",
-    "deploy": "git add -A && git commit -m 'update' && git push"
+    "deploy": "node scripts/deploy.mjs"
   },
   "devDependencies": {
     "@types/bun": "^1.0.0"

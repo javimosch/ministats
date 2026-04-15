@@ -2,14 +2,14 @@
 
 Real-time system metrics dashboard.
 
-## Install
+Author: Javier Leandro Arancibia
+
+## Quick Install
 
 ```bash
-# Server
-curl -fsSL https://raw.githubusercontent.com/javimosch/ministats/master/dist/ministats.xz | xz -d > /usr/local/bin/ministats && chmod +x /usr/local/bin/ministats
-
-# Client
-curl -fsSL https://raw.githubusercontent.com/javimosch/ministats/master/dist/ministats.xz | xz -d > /usr/local/bin/ministats && chmod +x /usr/local/bin/ministats
+# Install (delete old versions first if any)
+rm -f ~/.local/bin/ministats /usr/local/bin/ministats
+curl -fsSL https://raw.githubusercontent.com/javimosch/ministats/master/dist/ministats.xz | xz -d > ~/.local/bin/ministats && chmod +x ~/.local/bin/ministats
 ```
 
 ## Usage

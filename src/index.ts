@@ -1,8 +1,9 @@
 import { startServer } from "./server.ts";
 import { startClient } from "./client.ts";
-import { writeFileSync, chmodSync, unlinkSync } from "node:fs";
+import { writeFileSync, chmodSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { execSync } from "node:child_process";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -52,7 +53,6 @@ if (command === "server") {
   startClient(name, server);
 } else if (command === "update") {
   const execPath = process.argv[1];
-  const execDir = dirname(execPath);
   console.log("Checking for updates...");
 
   (async () => {
@@ -73,12 +73,11 @@ if (command === "server") {
       if (!binRes.ok) throw new Error(`Download failed: ${binRes.status}`);
       const binData = await binRes.arrayBuffer();
 
-      const tmpPath = join(execDir, "ministats.new");
+      const tmpPath = "/tmp/ministats.new";
       writeFileSync(tmpPath, Buffer.from(binData));
       chmodSync(tmpPath, 0o755);
 
-      unlinkSync(execPath);
-      chmodSync(tmpPath, 0o755);
+      execSync(`cp ${tmpPath} ${execPath}`);
       console.log(`Updated to ${release.tag_name}. Restart ministats to use the new version.`);
     } catch (err) {
       console.error(`Update failed: ${err}`);

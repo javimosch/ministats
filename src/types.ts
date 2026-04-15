@@ -3,6 +3,7 @@ export interface MemoryMetrics {
 }
 
 export interface DiskMetrics {
+  available: string;
   used: string;
   total: string;
   usePercent: number;

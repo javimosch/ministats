@@ -130,8 +130,8 @@ const METRICS_HTML = `<!DOCTYPE html>
           </div>
           <div class="panel">
             <div class="label">DISK</div>
-            <div class="value">\${client.disk.used}/\${client.disk.total}</div>
-            <div class="sub">/ - \${client.disk.usePercent}% | IUse: \${client.disk.iUsePercent}%</div>
+            <div class="value">\${client.disk.available}</div>
+            <div class="sub">\${client.disk.used}/\${client.disk.total} | \${client.disk.usePercent}% | IUse: \${client.disk.iUsePercent}%</div>
           </div>
           <div class="panel">
             <div class="label">CPU</div>

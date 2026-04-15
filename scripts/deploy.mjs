@@ -12,6 +12,7 @@ const newVersion = `${major}.${minor}.${patch + 1}`;
 pkg.version = newVersion;
 
 writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
+writeFileSync(join(__dirname, "..", "src", "version.ts"), `export const version = "${newVersion}";\n`);
 console.log(`Version bumped to ${newVersion}`);
 
 const distPath = join(__dirname, "..", "dist");

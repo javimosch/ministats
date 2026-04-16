@@ -5,14 +5,21 @@ REPO="javimosch/ministats"
 INSTALL_DIR="${INSTALL_DIR:-$HOME/.local/bin}"
 BINARY="ministats"
 
+ARCH=$(uname -m)
+case "$ARCH" in
+  x86_64) BINARY_NAME="ministats-x64.xz" ;;
+  aarch64|arm64) BINARY_NAME="ministats-arm64.xz" ;;
+  *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
+esac
+
 mkdir -p "$INSTALL_DIR"
 cd "$(mktemp -d)"
 
-LATEST_URL="https://api.github.com/repos/$REPO/releases/latest?v=$(date +%s.%3N)"
-DOWNLOAD_URL=$(curl -s "$LATEST_URL" | grep -o '"browser_download_url": "[^"]*"' | cut -d'"' -f4 | grep "ministats.xz")
+LATEST_URL="https://api.github.com/repos/$REPO/releases/latest"
+DOWNLOAD_URL=$(curl -s "$LATEST_URL" | grep -o '"browser_download_url": "[^"]*"' | cut -d'"' -f4 | grep "$BINARY_NAME")
 
 if [ -z "$DOWNLOAD_URL" ]; then
-  echo "Error: Could not find binary download URL"
+  echo "Error: Could not find binary download URL for $ARCH"
   exit 1
 fi
 

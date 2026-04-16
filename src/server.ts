@@ -1,5 +1,16 @@
 import { handleClientMessage, getAllClients } from "./state.ts";
 import type { ServerBroadcast } from "./types.ts";
+
+const dashboards = new Set<any>();
+
+function broadcastToDashboards() {
+  const state: ServerBroadcast = {
+    clients: getAllClients(),
+    timestamp: Date.now(),
+  };
+  const data = JSON.stringify(state);
+  dashboards.forEach((ws) => ws.send(data));
+}
 import { version } from "../package.json" assert { type: "json" };
 
 const METRICS_HTML = `<!DOCTYPE html>
@@ -176,6 +187,7 @@ export function startServer(port: number) {
 
     websocket: {
       open(ws) {
+        dashboards.add(ws);
         console.log("Dashboard connected");
         const state: ServerBroadcast = {
           clients: getAllClients(),
@@ -188,14 +200,11 @@ export function startServer(port: number) {
         if (data.startsWith("stats:")) {
           const payload = data.slice(6);
           handleClientMessage(payload, String(ws));
-          const broadcast: ServerBroadcast = {
-            clients: getAllClients(),
-            timestamp: Date.now(),
-          };
-          ws.send(JSON.stringify(broadcast));
+          broadcastToDashboards();
         }
       },
       close(ws) {
+        dashboards.delete(ws);
         console.log("Dashboard disconnected");
       },
     },

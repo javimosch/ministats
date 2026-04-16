@@ -1,6 +1,6 @@
 # MiniStats
 
-Real-time system metrics dashboard.
+Real-time system metrics dashboard for monitoring multiple machines.
 
 Author: Javier Leandro Arancibia
 
@@ -8,11 +8,6 @@ Author: Javier Leandro Arancibia
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/javimosch/ministats/master/scripts/install.sh | bash
-```
-
-Or manually:
-```bash
-curl -fsSL https://github.com/javimosch/ministats/releases/latest/download/ministats.xz | xz -d > ~/.local/bin/ministats && chmod +x ~/.local/bin/ministats
 ```
 
 ## Usage
@@ -26,7 +21,7 @@ ministats -v
 ```bash
 ministats server --port 9094
 ```
-Then open `http://localhost:9094` in your browser.
+Open `http://localhost:9094` in your browser.
 
 ### Start Client (on machines to monitor)
 ```bash
@@ -39,7 +34,16 @@ ministats update
 ```
 
 ## Build from Source
+
 ```bash
 bun install
 bun run build
 ```
+
+## Features
+
+- Real-time metrics via WebSocket
+- Memory, disk, CPU monitoring
+- Multiple client support
+- Auto-update mechanism
+- Multi-architecture (x64, arm64)

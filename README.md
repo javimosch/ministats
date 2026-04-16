@@ -2,7 +2,7 @@
 
 Real-time system metrics dashboard for monitoring multiple machines.
 
-Author: Javier Leandro Arancibia
+Licensed under MIT.
 
 ## Quick Install
 

@@ -27,6 +27,10 @@ MiniStats is different:
 
 No Prometheus. No Grafana. No setup hell.
 
+## Screenshot
+
+![dashboard](./image.png)
+
 ## Features
 
 - Real-time metrics via WebSocket

@@ -1,4 +1,4 @@
-import { handleClientMessage, getAllClients } from "./state.ts";
+import { handleClientMessage, getAllClients, pruneStaleClients } from "./state.ts";
 import type { ServerBroadcast } from "./types.ts";
 
 const dashboards = new Set<any>();
@@ -97,6 +97,17 @@ const METRICS_HTML = `<!DOCTYPE html>
     .sub { font-size: 11px; color: #666; margin-top: 4px; }
     .value.warning { color: #F5A623; }
     .value.danger { color: #E61919; }
+    .machine.stale { opacity: 0.5; }
+    .machine.stale .machine-name { border-left: 3px solid #F5A623; flex-direction: column; align-items: flex-start; }
+    .stale-badge {
+      display: inline-block;
+      font-size: 9px;
+      color: #F5A623;
+      margin-top: 6px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .stale-badge::before { content: '⚠ '; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
     .empty-state { padding: 40px; text-align: center; color: #666; }
     .version { text-align: center; margin-top: 24px; font-size: 11px; color: #555; }
   </style>
@@ -108,13 +119,17 @@ const METRICS_HTML = `<!DOCTYPE html>
     <div class="version">v${version}</div>
   </div>
   <script>
+    const STALE_MS = 5 * 60 * 1000;
+    let lastClients = [];
     const ws = new WebSocket(\`ws://\${location.host}/ws\`);
     ws.onopen = () => console.log("Connected to MiniStats server");
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      render(data.clients || []);
+      lastClients = data.clients || [];
+      render(lastClients);
     };
     ws.onerror = () => console.error("WebSocket error");
+    setInterval(() => { if (lastClients.length) render(lastClients); }, 30000);
     function getMemoryClass(available) {
       const match = available.match(/(\d+)/);
       if (!match) return "";
@@ -125,15 +140,26 @@ const METRICS_HTML = `<!DOCTYPE html>
       }
       return "";
     }
+    function timeAgo(ts) {
+      const sec = Math.floor((Date.now() - ts) / 1000);
+      if (sec < 60) return sec + 's ago';
+      const min = Math.floor(sec / 60);
+      if (min < 60) return min + 'm ago';
+      const hrs = Math.floor(min / 60);
+      return hrs + 'h ' + (min % 60) + 'm ago';
+    }
     function render(clients) {
+      const now = Date.now();
       const container = document.getElementById("machines");
       if (clients.length === 0) {
         container.innerHTML = '<div class="empty-state">No clients connected</div>';
         return;
       }
-      container.innerHTML = clients.map(client => \`
-        <div class="machine">
-          <div class="machine-name">\${client.name}</div>
+      container.innerHTML = clients.map(client => {
+        const stale = now - client.timestamp > STALE_MS;
+        return \`
+        <div class="machine\${stale ? ' stale' : ''}">
+          <div class="machine-name">\${client.name}\${stale ? '<div class="stale-badge">' + timeAgo(client.timestamp) + '</div>' : ''}</div>
           <div class="panel">
             <div class="label">MEMORY</div>
             <div class="value \${getMemoryClass(client.memory.available)}">\${client.memory.available}</div>
@@ -149,8 +175,8 @@ const METRICS_HTML = `<!DOCTYPE html>
             <div class="value">\${client.cpu.load5.toFixed(2)}</div>
             <div class="sub">\${client.cpu.load1.toFixed(2)}, \${client.cpu.load5.toFixed(2)}, \${client.cpu.load15.toFixed(2)}</div>
           </div>
-        </div>
-      \`).join("");
+        </div>\`;
+      }).join("");
     }
   </script>
 </body>
@@ -212,4 +238,12 @@ export function startServer(port: number) {
 
   console.log(`MiniStats server running on http://localhost:${server.port}`);
   console.log(`WebSocket endpoint: ws://localhost:${server.port}/ws`);
+
+  setInterval(() => {
+    const pruned = pruneStaleClients();
+    if (pruned.length > 0) {
+      console.log(`Pruned stale clients: ${pruned.join(", ")}`);
+      broadcastToDashboards();
+    }
+  }, 60_000);
 }

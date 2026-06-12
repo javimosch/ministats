@@ -1,5 +1,6 @@
 import { startServer } from "./server.ts";
 import { startClient } from "./client.ts";
+import { startDaemon, stopDaemon, checkDaemonStatus } from "./daemon.ts";
 import { writeFileSync, chmodSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -22,6 +23,9 @@ if (args[0] === "help" || args[0] === "--help") {
   console.log("Usage:");
   console.log("  ministats server --port <port>    Start the server (default: 9094)");
   console.log("  ministats client --name <name> --server <url>    Start a client");
+  console.log("  ministats daemon start --name <name> --server <url>    Start client as daemon");
+  console.log("  ministats daemon stop              Stop daemon");
+  console.log("  ministats daemon status            Check daemon status");
   console.log("  ministats update                   Update to latest version");
   console.log("  ministats -v, --version           Show version");
   process.exit(0);
@@ -58,6 +62,37 @@ if (command === "server") {
   }
 
   startClient(name, server);
+} else if (command === "daemon") {
+  const daemonAction = args[1];
+  
+  if (daemonAction === "start") {
+    let name: string | undefined;
+    let server: string | undefined;
+
+    for (let i = 2; i < args.length; i++) {
+      if (args[i] === "--name" && args[i + 1]) {
+        name = args[i + 1];
+        i++;
+      } else if (args[i] === "--server" && args[i + 1]) {
+        server = args[i + 1];
+        i++;
+      }
+    }
+
+    if (!name || !server) {
+      console.error("Error: --name and --server are required for daemon start");
+      process.exit(1);
+    }
+
+    startDaemon(name, server);
+  } else if (daemonAction === "stop") {
+    stopDaemon();
+  } else if (daemonAction === "status") {
+    checkDaemonStatus();
+  } else {
+    console.error("Error: Unknown daemon action. Use: start, stop, or status");
+    process.exit(1);
+  }
 } else if (command === "update") {
   console.log("Checking for updates...");
 

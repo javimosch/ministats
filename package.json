@@ -8,7 +8,7 @@
     "ministats": "./dist/ministats"
   },
   "scripts": {
-    "build": "(rm dist/ministats.xz | true) && bun build src/index.ts --outfile dist/ministats --no-cache --target=bun-linux-x64-baseline --compile --minify --production --bytecode && xz -9k dist/ministats && chmod +x dist/ministats*",
+    "build": "(rm dist/ministats.xz | true) && bun build src/index.ts --outfile dist/ministats --no-cache --target=bun-linux-x64-baseline --compile && xz -9k dist/ministats && chmod +x dist/ministats*",
     "dev": "bun run src/index.ts",
     "start": "bun run dist/ministats.js",
     "deploy": "node scripts/deploy.mjs"
